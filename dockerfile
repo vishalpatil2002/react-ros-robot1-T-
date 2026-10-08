@@ -160,7 +160,11 @@ COPY frontend/package.json frontend/package-lock.json /app/frontend/
 
 WORKDIR /app/frontend
 
-RUN npm ci
+RUN npm config set fetch-retries 5 \
+    && npm config set fetch-retry-mintimeout 20000 \
+    && npm config set fetch-retry-maxtimeout 120000 \
+    && npm config set fetch-timeout 600000 \
+    && npm ci
 
 
 # ============================================================
@@ -190,7 +194,11 @@ COPY backend/package.json backend/package-lock.json /app/backend/
 
 WORKDIR /app/backend
 
-RUN npm ci
+RUN npm config set fetch-retries 5 \
+    && npm config set fetch-retry-mintimeout 20000 \
+    && npm config set fetch-retry-maxtimeout 120000 \
+    && npm config set fetch-timeout 600000 \
+    && npm ci
 
 
 # ============================================================
