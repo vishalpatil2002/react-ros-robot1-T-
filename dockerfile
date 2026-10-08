@@ -147,41 +147,6 @@ WORKDIR /app
 
 
 # ============================================================
-# 9. Copy frontend package files first
-#    This improves Docker build cache
-# ============================================================
-
-COPY frontend/package.json frontend/package-lock.json /app/frontend/
-
-
-# ============================================================
-# 10. Install frontend dependencies
-# ============================================================
-
-WORKDIR /app/frontend
-
-RUN npm config set fetch-retries 5 \
-    && npm config set fetch-retry-mintimeout 20000 \
-    && npm config set fetch-retry-maxtimeout 120000 \
-    && npm config set fetch-timeout 600000 \
-    && npm ci
-
-
-# ============================================================
-# 11. Copy complete frontend source
-# ============================================================
-
-COPY frontend/ /app/frontend/
-
-
-# ============================================================
-# 12. Build React frontend
-# ============================================================
-
-RUN npm run build
-
-
-# ============================================================
 # 13. Copy backend package files
 # ============================================================
 
@@ -194,12 +159,13 @@ COPY backend/package.json backend/package-lock.json /app/backend/
 
 WORKDIR /app/backend
 
-RUN npm config set fetch-retries 5 \
-    && npm config set fetch-retry-mintimeout 20000 \
-    && npm config set fetch-retry-maxtimeout 120000 \
-    && npm config set fetch-timeout 600000 \
-    && npm ci
-
+RUN --mount=type=cache,target=/root/.npm \
+    npm config set registry https://registry.npmjs.org/ \
+    && npm config set fetch-retries 10 \
+    && npm config set fetch-retry-mintimeout 30000 \
+    && npm config set fetch-retry-maxtimeout 300000 \
+    && npm config set fetch-timeout 1800000 \
+    && npm ci --no-audit --no-fund --prefer-offline
 
 # ============================================================
 # 15. Copy complete backend source
@@ -207,6 +173,12 @@ RUN npm config set fetch-retries 5 \
 
 COPY backend/ /app/backend/
 
+
+#=============================================================
+# Copy React production build
+# ============================================================
+
+COPY frontend/build/ /app/frontend/build/
 
 # ============================================================
 # 16. Configure ROS environment
