@@ -14,11 +14,11 @@ spec:
     spec:
       containers:
         - name: react-ros-robot1
-          image: vishal6363/react-ros-robot1:latest
+          image: vishal6363/react-ros-robot1:9
           imagePullPolicy: Always
           ports:
             - name: frontend
-              containerPort: 80
+              containerPort: 3000
             - name: backend
               containerPort: 5000
             - name: rosbridge
@@ -32,15 +32,18 @@ spec:
               set -e
               source /opt/ros/noetic/setup.bash
 
-              echo "Preparing React frontend..."
-              node /app/frontend-server.js &
-
               echo "Starting ROS master..."
               roscore &
-              sleep 5
+              until rosparam list >/dev/null 2>&1; do
+                sleep 1
+              done
 
-              echo "Starting ROS bridge..."
-              roslaunch rosbridge_server rosbridge_websocket.launch &
+              echo "Starting rosbridge without starting another master..."
+              roslaunch --wait rosbridge_server rosbridge_websocket.launch &
+              sleep 3
+
+              echo "Starting React frontend..."
+              node /app/frontend-server.js &
 
               echo "Starting backend..."
               cd /app/backend
