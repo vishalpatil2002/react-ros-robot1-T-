@@ -118,10 +118,9 @@ RUN pip3 install --no-cache-dir \
 # 6. Install Node.js 16
 # ============================================================
 
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update \
     && apt-get install -y nodejs \
-    && npm install -g npm@8 \
     && node --version \
     && npm --version \
     && apt-get clean \
@@ -145,6 +144,7 @@ RUN npm install -g \
 
 WORKDIR /app
 
+COPY frontend-server.js /app/frontend-server.js
 
 # ============================================================
 # 13. Copy backend package files

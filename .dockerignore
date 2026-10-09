@@ -17,3 +17,7 @@ dist
 
 tmp
 temp
+
+# Exclude installed dependencies from the host
+node_modules
+**/node_modules

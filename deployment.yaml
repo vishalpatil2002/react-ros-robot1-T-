@@ -4,49 +4,39 @@ metadata:
   name: react-ros-robot1
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: react-ros-robot1
-
   template:
     metadata:
       labels:
         app: react-ros-robot1
-
     spec:
       containers:
         - name: react-ros-robot1
           image: vishal6363/react-ros-robot1:latest
-
           imagePullPolicy: Always
-
           ports:
             - name: frontend
-              containerPort: 3000
-
+              containerPort: 80
             - name: backend
               containerPort: 5000
-
             - name: rosbridge
               containerPort: 9090
-
           env:
             - name: ROS_MASTER_URI
               value: "http://localhost:11311"
-
-          command:
-            - /bin/bash
-            - -c
-
+          command: ["/bin/bash", "-c"]
           args:
             - |
+              set -e
               source /opt/ros/noetic/setup.bash
-              source /root/.bashrc
 
-              echo "Starting ROS..."
+              echo "Preparing React frontend..."
+              node /app/frontend-server.js &
+
+              echo "Starting ROS master..."
               roscore &
-
               sleep 5
 
               echo "Starting ROS bridge..."
@@ -54,4 +44,4 @@ spec:
 
               echo "Starting backend..."
               cd /app/backend
-              npm start
+              exec npm start
