@@ -67,8 +67,7 @@ const io = socketIO(server, {
 // creating redis client
 
 const taurusClient = new createClient({
-  // url: `redis://${taurusRedisIp}:${redisPort}`,
-  url: `redis://localhost:6379`,
+  url: `redis://${taurusRedisIp}:${redisPort}`,
 });
 
 const conveyorClient = new createClient({
